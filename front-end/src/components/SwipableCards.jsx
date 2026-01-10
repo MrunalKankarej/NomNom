@@ -1,34 +1,63 @@
-import React from "react";
-import { useSwipeable } from "react-swipeable";
+import { useRef } from "react";
+import { gsap } from "gsap";
 
-export default function SwipableCard({ image, onSwipe, style }) {
-  const handlers = useSwipeable({
-    onSwipedLeft: () => onSwipe(false),  // pass
-    onSwipedRight: () => onSwipe(true),  // like
-    preventDefaultTouchmoveEvent: true,
-    trackMouse: true,  // allows mouse drag
-  });
+export default function SwipableCards({ image, onLike, onPass }) {
+  const cardRef = useRef(null);
+
+  function swipeRight() {
+    gsap.to(cardRef.current, {
+      x: 500,
+      rotation: 20,
+      opacity: 0,
+      duration: 0.4,
+      onComplete: onLike,
+    });
+  }
+
+  function swipeLeft() {
+    gsap.to(cardRef.current, {
+      x: -500,
+      rotation: -20,
+      opacity: 0,
+      duration: 0.4,
+      onComplete: onPass,
+    });
+  }
 
   return (
-    <div
-      {...handlers}
-      style={{
-        position: "absolute",
-        width: "200px",
-        height: "200px",
-        borderRadius: "25px",
-        overflow: "hidden",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-        cursor: "grab",
-        backgroundColor: "#fff",
-        ...style,
-      }}
-    >
-      <img
-        src={image}
-        alt="food"
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-      />
+    <div style={{ textAlign: "center" }}>
+      <div
+        ref={cardRef}
+        style={{
+          width: 320,
+          height: 420,
+          margin: "0 auto",
+          borderRadius: 20,
+          overflow: "hidden",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+          background: "#fff",
+        }}
+      >
+        <img
+          src={image}
+          alt="food"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      </div>
+
+      <div style={{ marginTop: 20 }}>
+        <button
+          onClick={swipeLeft}
+          style={{ marginRight: 20, fontSize: 20 }}
+        >
+          ❌ Pass
+        </button>
+
+        <button onClick={swipeRight} style={{ fontSize: 20 }}>
+          ❤️ Like
+        </button>
+      </div>
     </div>
   );
-}
+      }
+
