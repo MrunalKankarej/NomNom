@@ -1,0 +1,69 @@
+:root {
+  --tea-green: #ccd5ae;
+  --beige: #e9edc9;
+  --cornsilk: #fefae0;
+  --papaya-whip: #faedcd;
+  --light-bronze: #d4a373;
+}
+
+/* Container */
+.welcome-container {
+  text-align: center;
+  padding: 3rem 1.5rem 5rem;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, var(--cornsilk), var(--beige));
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Image banner */
+.image-banner {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+/* Title */
+.app-title {
+  font-family: "Black 900 Italic", serif;
+  font-size: 6rem;
+  margin: 0;
+  color: var(--light-bronze);
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Tagline */
+.tagline {
+  font-size: 1.35rem;
+  margin-top: 1rem;
+  margin-bottom: 2.5rem;
+  color: #555;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+/* CTA Button */
+.cta-button {
+  background: var(--light-bronze);
+  color: white;
+  border: none;
+  padding: 0.9rem 2.6rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  transition: all 0.25s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  background: #c29062;
+}
+
+.cta-button:active {
+  transform: translateY(0);
+}

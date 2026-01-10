@@ -1,43 +1,36 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { gsap } from 'gsap';
 import './BounceCards.css';
 
-// Place this at the top of BounceCards.jsx, **before the component function**
 const generateTransforms = (count) => {
-  const spread = 120;      // horizontal spacing between cards
-  const maxRotate = 12;   // max rotation degrees for outermost cards
-  const baseShift = 2;   // move entire stack to the right
+  const spread = 120;
+  const maxRotate = 12;
   const center = (count - 1) / 2;
 
   return Array.from({ length: count }, (_, i) => {
     const offset = i - center;
     const rotate = center === 0 ? 0 : offset * (maxRotate / center);
-    const translateX = offset * spread + baseShift;
-
-    return `translate(${translateX}px) rotate(${rotate}deg)`;
+    const x = offset * spread;
+    return `translate(${x}px) rotate(${rotate}deg)`;
   });
 };
-
 
 export default function BounceCards({
   className = '',
   images = [],
-  containerWidth = 600,
-  containerHeight = 600,
+  containerWidth = 400,
+  containerHeight = 400,
   animationDelay = 0.5,
   animationStagger = 0.06,
   easeType = 'elastic.out(1, 0.8)',
-  transformStyles = [
-    'rotate(10deg) translate(-170px)',
-    'rotate(5deg) translate(-85px)',
-    'rotate(-3deg)',
-    'rotate(-10deg) translate(85px)',
-    'rotate(2deg) translate(170px)'
-  ],
   enableHover = true
 }) {
   const containerRef = useRef(null);
-  const computedTransforms = generateTransforms(images.length);
+
+  const transforms = useMemo(
+    () => generateTransforms(images.length),
+    [images.length]
+  );
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -52,105 +45,73 @@ export default function BounceCards({
         }
       );
     }, containerRef);
+
     return () => ctx.revert();
-  }, [animationStagger, easeType, animationDelay]);
+  }, [animationDelay, animationStagger, easeType]);
 
+  const removeRotation = (t) =>
+    t.replace(/rotate\([\s\S]*?\)/, 'rotate(0deg)');
 
-  const getNoRotationTransform = transformStr => {
-    const hasRotate = /rotate\([\s\S]*?\)/.test(transformStr);
-    if (hasRotate) {
-      return transformStr.replace(/rotate\([\s\S]*?\)/, 'rotate(0deg)');
-    } else if (transformStr === 'none') {
-      return 'rotate(0deg)';
-    } else {
-      return `${transformStr} rotate(0deg)`;
-    }
+  const pushTransform = (t, offsetX) => {
+    const match = t.match(/translate\(([-0-9.]+)px\)/);
+    if (!match) return t;
+    const newX = parseFloat(match[1]) + offsetX;
+    return t.replace(
+      /translate\(([-0-9.]+)px\)/,
+      `translate(${newX}px)`
+    );
   };
 
-  const getPushedTransform = (baseTransform, offsetX) => {
-    const translateRegex = /translate\(([-0-9.]+)px\)/;
-    const match = baseTransform.match(translateRegex);
-    if (match) {
-      const currentX = parseFloat(match[1]);
-      const newX = currentX + offsetX;
-      return baseTransform.replace(translateRegex, `translate(${newX}px)`);
-    } else {
-      return baseTransform === 'none' ? `translate(${offsetX}px)` : `${baseTransform} translate(${offsetX}px)`;
-    }
-  };
-
-  const pushSiblings = hoveredIdx => {
-    if (!enableHover || !containerRef.current) return;
-
+  const pushSiblings = (hoveredIdx) => {
+    if (!enableHover) return;
     const q = gsap.utils.selector(containerRef);
 
     images.forEach((_, i) => {
-      const target = q(`.card-${i}`);
-      gsap.killTweensOf(target);
-
-      const baseTransform = computedTransforms[i] || 'none';
+      const card = q(`.card-${i}`);
+      gsap.killTweensOf(card);
 
       if (i === hoveredIdx) {
-        const noRotationTransform = getNoRotationTransform(baseTransform);
-        gsap.to(target, {
-          transform: noRotationTransform,
+        gsap.to(card, {
+          transform: removeRotation(transforms[i]),
+          scale: 1.12,
           duration: 0.4,
-          ease: 'back.out(1.4)',
-          overwrite: 'auto'
+          ease: 'back.out(1.4)'
         });
       } else {
-        const offsetX = i < hoveredIdx ? -160 : 160;
-        const pushedTransform = getPushedTransform(baseTransform, offsetX);
-
-        const distance = Math.abs(hoveredIdx - i);
-        const delay = distance * 0.05;
-
-        gsap.to(target, {
-          transform: pushedTransform,
+        const offset = i < hoveredIdx ? -160 : 160;
+        gsap.to(card, {
+          transform: pushTransform(transforms[i], offset),
           duration: 0.4,
-          ease: 'back.out(1.4)',
-          delay,
-          overwrite: 'auto'
+          delay: Math.abs(i - hoveredIdx) * 0.05,
+          ease: 'back.out(1.4)'
         });
       }
     });
   };
 
   const resetSiblings = () => {
-    if (!enableHover || !containerRef.current) return;
-
     const q = gsap.utils.selector(containerRef);
-
     images.forEach((_, i) => {
-      const target = q(`.card-${i}`);
-      gsap.killTweensOf(target);
-      const baseTransform = computedTransforms[i] || 'none';
-      gsap.to(target, {
-        transform: baseTransform,
+      gsap.to(q(`.card-${i}`), {
+        transform: transforms[i],
+        scale: 1,
         duration: 0.4,
-        ease: 'back.out(1.4)',
-        overwrite: 'auto'
+        ease: 'back.out(1.4)'
       });
     });
   };
 
   return (
     <div
-      className={`bounceCardsContainer ${className}`}
       ref={containerRef}
-      style={{
-        position: 'relative',
-        width: containerWidth,
-        height: containerHeight
-      }}
+      className={`bounceCardsContainer ${className}`}
+      style={{ width: containerWidth, height: containerHeight }}
     >
       {images.map((src, idx) => (
         <div
           key={idx}
           className={`card card-${idx}`}
-          style={{
-            transform: computedTransforms[idx]
-          }}
+          style={{ transform: transforms[idx] }}
           onMouseEnter={() => pushSiblings(idx)}
           onMouseLeave={resetSiblings}
         >
