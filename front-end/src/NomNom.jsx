@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "./api";
 
 import WelcomeScreen from "./components/WelcomeScreen";
 import MoodScreen from "./components/MoodScreen";
@@ -10,8 +11,14 @@ export default function NomNom() {
   // welcome -> mood -> room -> swipe -> result
   const [screen, setScreen] = useState("welcome");
   const [mood, setMood] = useState(null);
-  const [roomCode, setRoomCode] = useState("");
-  const [userId] = useState(() => "u" + Math.random().toString(16).slice(2, 8));
+
+  const [roomCode, setRoomCode] = useState(localStorage.getItem("roomCode") || "");
+  const [userId, setUserId] = useState(localStorage.getItem("userId") || "");
+
+  useEffect(() => {
+    if (roomCode) localStorage.setItem("roomCode", roomCode);
+    if (userId) localStorage.setItem("userId", userId);
+  }, [roomCode, userId]);
 
   function handleStart() {
     setScreen("mood");
@@ -27,17 +34,27 @@ export default function NomNom() {
   }
   
 
-  function handleCreateRoom() {
-    // TEMP fake code (backend will replace this later)
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let code = "";
-    for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
-    setRoomCode(code);
+  async function handleCreateRoom() {
+    try {
+      const { roomCode: code } = await api("/api/rooms", { method: "POST" });
+      setRoomCode(code);
+
+      const joinRes = await api(`/api/rooms/${code}/join`, { method: "POST" });
+      setUserId(joinRes.userId);
+    } catch (e) {
+      alert("Create room failed: " + (e.message || e));
+    }
   }
 
-  function handleJoinRoom(code) {
-    setRoomCode(code);
-    setScreen("swipe");
+  async function handleJoinRoom(code) {
+    try {
+      const joinRes = await api(`/api/rooms/${code}/join`, { method: "POST" });
+      setRoomCode(code);
+      setUserId(joinRes.userId);
+      setScreen("swipe");
+    } catch (e) {
+      alert("Join room failed: " + (e.message || e));
+    }
   }
 
   function handleStartSwiping() {
@@ -51,11 +68,17 @@ export default function NomNom() {
   function handleRestart() {
     setMood(null);
     setRoomCode("");
+    setUserId("");
+    localStorage.removeItem("roomCode");
+    localStorage.removeItem("userId");
     setScreen("welcome");
   }
 
   if (screen === "welcome") return <WelcomeScreen onStart={handleStart} />;
-  if (screen === "mood") return <MoodScreen onSelectMood={handleSelectMood} onBack={handleRestart} />;
+
+  if (screen === "mood")
+    return <MoodScreen onSelectMood={handleSelectMood} onBack={handleRestart} />;
+
   if (screen === "room")
     return (
       <RoomScreen
@@ -67,6 +90,7 @@ export default function NomNom() {
         onBack={() => setScreen("mood")}
       />
     );
+
   if (screen === "swipe")
     return (
       <SwipeScreen
@@ -78,6 +102,5 @@ export default function NomNom() {
       />
     );
 
-  return <ResultScreen onRestart={handleRestart} />;
+  return <ResultScreen roomCode={roomCode} onRestart={handleRestart} />;
 }
-
