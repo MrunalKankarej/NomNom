@@ -19,8 +19,13 @@ export default function NomNom() {
 
   function handleSelectMood(selectedMood) {
     setMood(selectedMood);
+  
+    // resets old room info when switching moods
+    setRoomCode("");
+  
     setScreen("room");
   }
+  
 
   function handleCreateRoom() {
     // TEMP fake code (backend will replace this later)
