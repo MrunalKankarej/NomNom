@@ -28,17 +28,64 @@ export default function NomNom() {
   
 
   function handleCreateRoom() {
-    // TEMP fake code (backend will replace this later)
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    //  ONLY uppercase letters (NO numbers)
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let code = "";
-    for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  
+    for (let i = 0; i < 4; i++) {
+      code += chars[Math.floor(Math.random() * chars.length)];
+    }
+  
     setRoomCode(code);
+  
+    // Save mood for this code
+    const raw = localStorage.getItem("nomnom_roomMoodMap");
+    const map = raw ? JSON.parse(raw) : {};
+    map[code] = mood;
+    localStorage.setItem("nomnom_roomMoodMap", JSON.stringify(map));
   }
-
+  
+  
   function handleJoinRoom(code) {
-    setRoomCode(code);
+    const rawInput = (code || "").trim();
+  
+    //  Reject lowercase
+    if (rawInput !== rawInput.toUpperCase()) {
+      alert("Invalid code. Use ALL CAPS letters only.");
+      return;
+    }
+  
+    //  Reject anything that is NOT exactly 4 letters A–Z
+    const valid = /^[A-Z]{4}$/.test(rawInput);
+    if (!valid) {
+      alert("Invalid code. Room codes must be EXACTLY 4 uppercase letters (A–Z). No numbers.");
+      return;
+    }
+  
+    //  Check if this code exists
+    const raw = localStorage.getItem("nomnom_roomMoodMap");
+    const map = raw ? JSON.parse(raw) : {};
+    const codeMood = map[rawInput];
+  
+    if (!codeMood) {
+      alert("Code not found. Ask the host to share the correct code.");
+      return;
+    }
+  
+    //  Reject if wrong mood
+    if (codeMood !== mood) {
+      alert(`Wrong mood 😭 This code belongs to "${codeMood}", not "${mood}".`);
+      return;
+    }
+  
+    //  Valid join
+    setRoomCode(rawInput);
     setScreen("swipe");
   }
+  
+  
+  
+
 
   function handleStartSwiping() {
     setScreen("swipe");
@@ -51,6 +98,7 @@ export default function NomNom() {
   function handleRestart() {
     setMood(null);
     setRoomCode("");
+    localStorage.removeItem("nomnom_roomMoodMap");
     setScreen("welcome");
   }
 

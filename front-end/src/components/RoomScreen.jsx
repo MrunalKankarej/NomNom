@@ -9,7 +9,8 @@ export default function RoomScreen({
     function handleJoinClick() {
       const code = prompt("Enter room code (4 letters):");
       if (!code) return;
-      onJoinRoom(code.toUpperCase().trim());
+      onJoinRoom(code.trim());
+
     }
   
     function copyCode() {
