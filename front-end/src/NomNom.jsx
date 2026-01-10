@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "./api";
 
 import WelcomeScreen from "./components/WelcomeScreen";
 import MoodScreen from "./components/MoodScreen";
@@ -10,8 +11,14 @@ export default function NomNom() {
   // welcome -> mood -> room -> swipe -> result
   const [screen, setScreen] = useState("welcome");
   const [mood, setMood] = useState(null);
-  const [roomCode, setRoomCode] = useState("");
-  const [userId] = useState(() => "u" + Math.random().toString(16).slice(2, 8));
+
+  const [roomCode, setRoomCode] = useState(localStorage.getItem("roomCode") || "");
+  const [userId, setUserId] = useState(localStorage.getItem("userId") || "");
+
+  useEffect(() => {
+    if (roomCode) localStorage.setItem("roomCode", roomCode);
+    if (userId) localStorage.setItem("userId", userId);
+  }, [roomCode, userId]);
 
   function handleStart() {
     setScreen("mood");
@@ -98,12 +105,21 @@ export default function NomNom() {
   function handleRestart() {
     setMood(null);
     setRoomCode("");
+<<<<<<< HEAD
     localStorage.removeItem("nomnom_roomMoodMap");
+=======
+    setUserId("");
+    localStorage.removeItem("roomCode");
+    localStorage.removeItem("userId");
+>>>>>>> dbcb6a355214200a0b3dd18f8765442ff1c89dc2
     setScreen("welcome");
   }
 
   if (screen === "welcome") return <WelcomeScreen onStart={handleStart} />;
-  if (screen === "mood") return <MoodScreen onSelectMood={handleSelectMood} onBack={handleRestart} />;
+
+  if (screen === "mood")
+    return <MoodScreen onSelectMood={handleSelectMood} onBack={handleRestart} />;
+
   if (screen === "room")
     return (
       <RoomScreen
@@ -115,6 +131,7 @@ export default function NomNom() {
         onBack={() => setScreen("mood")}
       />
     );
+
   if (screen === "swipe")
     return (
       <SwipeScreen
@@ -126,6 +143,5 @@ export default function NomNom() {
       />
     );
 
-  return <ResultScreen onRestart={handleRestart} />;
+  return <ResultScreen roomCode={roomCode} onRestart={handleRestart} />;
 }
-
