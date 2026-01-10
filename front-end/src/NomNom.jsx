@@ -105,13 +105,7 @@ export default function NomNom() {
   function handleRestart() {
     setMood(null);
     setRoomCode("");
-<<<<<<< HEAD
     localStorage.removeItem("nomnom_roomMoodMap");
-=======
-    setUserId("");
-    localStorage.removeItem("roomCode");
-    localStorage.removeItem("userId");
->>>>>>> dbcb6a355214200a0b3dd18f8765442ff1c89dc2
     setScreen("welcome");
   }
 
