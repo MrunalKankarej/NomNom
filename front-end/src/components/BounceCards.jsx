@@ -6,7 +6,7 @@ import './BounceCards.css';
 const generateTransforms = (count) => {
   const spread = 120;      // horizontal spacing between cards
   const maxRotate = 12;   // max rotation degrees for outermost cards
-  const baseShift = 150;   // move entire stack to the right
+  const baseShift = 2;   // move entire stack to the right
   const center = (count - 1) / 2;
 
   return Array.from({ length: count }, (_, i) => {
