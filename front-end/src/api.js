@@ -1,4 +1,4 @@
-export const API_BASE = "http://127.0.0.1:5001";
+export const API_BASE = `http://${window.location.hostname}:5001`;
 
 export async function api(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {

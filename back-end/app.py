@@ -1,3 +1,5 @@
+# app.py
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import string
@@ -6,21 +8,26 @@ import uuid
 
 app = Flask(__name__)
 
-# If your frontend runs on a different port (Vite often 5173), add it here.
-CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173"]}})
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+
+# Dev-friendly CORS so multiple browsers/devices can hit your backend.
+# If you want to lock it down later, replace "*" with your frontend origin(s).
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 rooms = {}
 # rooms[roomCode] = {
 #   "users": set(userId),
 #   "votes": {
 #       foodId: {"likes": int, "passes": int, "voters": {userId: "like"|"pass"}}
-#   }
+#   },
+#   "mood": str
 # }
 
-def generate_room_code(length=5):
+def generate_room_code(length=4):
     # ensure uniqueness
     while True:
-        code = ''.join(random.choices(string.ascii_uppercase, k=length))
+        code = "".join(random.choices(string.ascii_uppercase, k=length))
         if code not in rooms:
             return code
 
@@ -31,11 +38,21 @@ def generate_user_id():
 def root():
     return jsonify({"ok": True, "message": "Backend running", "try": ["/api/health"]})
 
+@app.route("/api/health", methods=["GET"])
+def health():
+    return jsonify({"ok": True})
+
 @app.route("/api/rooms", methods=["POST"])
 def create_room():
-    room_code = generate_room_code()
-    rooms[room_code] = {"users": set(), "votes": {}}
-    return jsonify({"roomCode": room_code})
+    data = request.json or {}
+    mood = data.get("mood")
+
+    if not mood:
+        return jsonify({"error": "Missing mood"}), 400
+
+    room_code = generate_room_code(length=4)
+    rooms[room_code] = {"users": set(), "votes": {}, "mood": mood}
+    return jsonify({"roomCode": room_code, "mood": mood})
 
 @app.route("/api/rooms/<room_code>/join", methods=["POST"])
 def join_room(room_code):
@@ -45,7 +62,7 @@ def join_room(room_code):
 
     user_id = generate_user_id()
     room["users"].add(user_id)
-    return jsonify({"userId": user_id})
+    return jsonify({"userId": user_id, "mood": room.get("mood")})
 
 @app.route("/api/rooms/<room_code>/vote", methods=["POST"])
 def vote_food(room_code):
@@ -83,7 +100,8 @@ def vote_food(room_code):
         entry["passes"] += 1
 
     entry["voters"][user_id] = vote_type
-    return jsonify({"ok": True, "foodId": food_id, "vote": vote_type})
+
+    return jsonify({"ok": True, "roomCode": room_code, "foodId": food_id, "vote": vote_type})
 
 @app.route("/api/rooms/<room_code>/results", methods=["GET"])
 def get_results(room_code):
@@ -104,20 +122,13 @@ def get_results(room_code):
             "foodId": fid,
             "likes": v["likes"],
             "passes": v["passes"],
-            "voters": list(v["voters"].keys())  # safe JSON
+            "voters": list(v["voters"].keys()),
         }
 
     winner = serialize_food(winner_id, votes[winner_id]) if winner_id else None
     breakdown = [serialize_food(fid, v) for fid, v in votes.items()]
-    return jsonify({"winnerFood": winner, "breakdown": breakdown})
-
-@app.route("/api/health", methods=["GET"])
-def health():
-    return jsonify({"ok": True})
+    return jsonify({"winnerFood": winner, "breakdown": breakdown, "mood": room.get("mood")})
 
 if __name__ == "__main__":
-    print("Starting Flask backend on http://127.0.0.1:5001/")
+    print("Starting Flask backend on http://0.0.0.0:5001/")
     app.run(host="0.0.0.0", port=5001, debug=True)
-
-
-
