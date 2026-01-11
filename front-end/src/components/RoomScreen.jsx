@@ -1,100 +1,63 @@
-export default function RoomScreen({
-    mood,
-    roomCode,
-    onCreateRoom,
-    onJoinRoom,
-    onStartSwiping,
-    onBack,
-  }) {
-    function handleJoinClick() {
-      const code = prompt("Enter room code (4 letters):");
-      if (!code) return;
-      onJoinRoom(code.trim());
+import './RoomScreen.css';
 
-    }
-  
-    function copyCode() {
-      if (!roomCode) return;
-      navigator.clipboard.writeText(roomCode);
-      alert("Copied code: " + roomCode);
-    }
-  
-    return (
-      <div style={{ maxWidth: 700, margin: "70px auto", padding: 20, textAlign: "center" }}>
-        <h2 style={{ fontSize: 36, marginBottom: 8 }}>Room</h2>
-        <p style={{ marginTop: 0, color: "#444" }}>
-          Selected mood: <strong>{mood}</strong>
-        </p>
-  
-        <div style={{ marginTop: 30 }}>
-          <button
-            onClick={onCreateRoom}
-            style={{
-              padding: "12px 18px",
-              borderRadius: 10,
-              cursor: "pointer",
-              fontSize: 16,
-              marginRight: 12,
-            }}
-          >
-            Create Room
-          </button>
-  
-          <button
-            onClick={handleJoinClick}
-            style={{
-              padding: "12px 18px",
-              borderRadius: 10,
-              cursor: "pointer",
-              fontSize: 16,
-            }}
-          >
-            Join Room
-          </button>
-        </div>
-  
-        {roomCode && (
-          <div
-            style={{
-              marginTop: 30,
-              border: "1px solid #ddd",
-              borderRadius: 16,
-              padding: 20,
-              background: "white",
-              boxShadow: "0 8px 18px rgba(0,0,0,0.06)",
-            }}
-          >
-            <div style={{ fontSize: 14, color: "#666" }}>Your room code:</div>
-            <div style={{ fontSize: 48, fontWeight: 800, letterSpacing: 6, margin: "10px 0" }}>
-              {roomCode}
-            </div>
-  
-            <button onClick={copyCode} style={{ padding: "10px 14px", borderRadius: 10 }}>
-              Copy Code
-            </button>
-  
-            <div style={{ marginTop: 16 }}>
-              <button
-                onClick={onStartSwiping}
-                style={{
-                  padding: "12px 18px",
-                  borderRadius: 10,
-                  cursor: "pointer",
-                  fontSize: 16,
-                }}
-              >
-                Start Swiping
-              </button>
-            </div>
-          </div>
-        )}
-  
-        <div style={{ marginTop: 24 }}>
-          <button onClick={onBack} style={{ padding: "10px 14px" }}>
-            Back
-          </button>
-        </div>
-      </div>
-    );
+export default function RoomScreen({
+  mood,
+  roomCode,
+  onCreateRoom,
+  onJoinRoom,
+  onStartSwiping,
+  onBack,
+}) {
+  function handleJoinClick() {
+    const code = prompt("Enter room code (4 letters):");
+    if (!code) return;
+    onJoinRoom(code.trim());
   }
-  
+
+  function copyCode() {
+    if (!roomCode) return;
+    navigator.clipboard.writeText(roomCode);
+    alert("Copied code: " + roomCode);
+  }
+
+  return (
+    <div className="room-container">
+      <h2 className="room-title">Room</h2>
+      <p className="room-subtitle">
+        Selected mood: <strong>{mood}</strong>
+      </p>
+
+      <div className="room-buttons">
+        <button className="primary-btn" onClick={onCreateRoom}>
+          Create Room
+        </button>
+        <button className="secondary-btn" onClick={handleJoinClick}>
+          Join Room
+        </button>
+      </div>
+
+      {roomCode && (
+        <div className="room-code-card">
+          <div className="room-code-label">Your room code:</div>
+          <div className="room-code">{roomCode}</div>
+
+          <button className="secondary-btn" onClick={copyCode}>
+            Copy Code
+          </button>
+
+          <div style={{ marginTop: 16 }}>
+            <button className="primary-btn" onClick={onStartSwiping}>
+              Start Swiping
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="room-back">
+        <button className="secondary-btn" onClick={onBack}>
+          ← Back
+        </button>
+      </div>
+    </div>
+  );
+}

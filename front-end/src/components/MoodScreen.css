@@ -1,0 +1,103 @@
+/* Page container */
+.mood-container {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 50px;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(to bottom, var(--cream), #f7efd8);
+  min-height: 100vh;
+}
+
+/* Title */
+.mood-title {
+  font-size: 2.6rem;
+  margin-bottom: 0.3rem;
+  color: var(--olive);
+}
+
+/* Subtitle */
+.mood-subtitle {
+  color: var(--espresso);
+  margin-bottom: 2rem;
+}
+
+/* Grid */
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* Card */
+.mood-card {
+  background: #d1dbc5;
+  border: 2px solid var(--caramel);
+  border-radius: 22px;
+  padding: 20px;
+  text-align: left;
+  cursor: pointer;
+  min-height: 180px;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(201, 124, 61, 0.25);
+  transition: all 0.25s ease;
+}
+
+/* Hover feel */
+.mood-card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.18),
+    0 0 0 2px var(--caramel);
+}
+
+/* Emoji */
+.mood-emoji {
+  font-size: 3rem;
+}
+
+/* Label */
+.mood-label {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 0.4rem;
+  color: #4f5d2f;
+}
+
+/* Description */
+.mood-desc {
+  margin-top: 0.3rem;
+  color: var(--espresso);
+  font-size: 0.9rem;
+}
+
+/* Decorative preview strip */
+.mood-preview {
+  margin-top: 1rem;
+  height: 70px;
+  border-radius: 14px;
+  background: 
+    var(--caramel);
+  opacity: 0.9;
+}
+
+/* Footer */
+.mood-footer {
+  margin-top: 2.5rem;
+}
+
+/* Back button */
+.back-button {
+  background: transparent;
+  border: none;
+  color: var(--caramel);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  color: var(--olive);
+}

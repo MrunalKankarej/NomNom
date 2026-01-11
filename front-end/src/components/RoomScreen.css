@@ -1,0 +1,106 @@
+:root {
+  --cream: #fff6df;
+  --olive: #4f5d2f;
+  --sage: #a3b18a;
+  --caramel: #c97c3d;
+  --espresso: #2b2118;
+  --beige-bg: #f7efd8; /* same as WelcomeScreen gradient bottom */
+}
+
+/* Container */
+.room-container {
+  max-width: 1000px;
+  margin: 70px auto;
+  padding: 20px;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  min-height: 350px;
+  background: linear-gradient(to bottom, var(--cream), var(--beige-bg));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Title */
+.room-title {
+  font-size: 36px;
+  margin-bottom: 8px;
+  color: var(--olive);
+}
+
+/* Subtitle / selected mood */
+.room-subtitle {
+  margin-top: 0;
+  color: var(--espresso);
+  font-size: 18px;
+}
+
+/* Buttons */
+.primary-btn {
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--caramel);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+  transition: all 0.25s ease;
+}
+
+.primary-btn:hover {
+  background: #b4622d;
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--sage);
+  color: var(--olive);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+  transition: all 0.25s ease;
+}
+
+.secondary-btn:hover {
+  background: #92a076;
+  transform: translateY(-2px);
+}
+
+/* Buttons container */
+.room-buttons {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Room code card */
+.room-code-card {
+  margin-top: 30px;
+  border-radius: 16px;
+  padding: 24px;
+  background: var(--cream);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+.room-code-label {
+  font-size: 14px;
+  color: var(--espresso);
+}
+
+.room-code {
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  margin: 10px 0;
+  color: var(--olive);
+}
+
+/* Back button section */
+.room-back {
+  margin-top: 24px;
+}

@@ -1,6 +1,5 @@
 import BounceCards from "./BounceCards";
 import './WelcomeScreen.css';
-
 import burger from "../assets/burger.jpg";
 import hotpot from "../assets/hotpot.jpg";
 import indian from "../assets/indian.jpg";

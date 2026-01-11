@@ -1,9 +1,9 @@
 :root {
-  --tea-green: #ccd5ae;
-  --beige: #e9edc9;
-  --cornsilk: #fefae0;
-  --papaya-whip: #faedcd;
-  --light-bronze: #d4a373;
+  --cream: #fff6df;
+  --olive: #4f5d2f;
+  --sage: #a3b18a;
+  --caramel: #c97c3d;
+  --espresso: #2b2118;
 }
 
 /* Container */
@@ -11,7 +11,7 @@
   text-align: center;
   padding: 3rem 1.5rem 5rem;
   min-height: 100vh;
-  background: linear-gradient(to bottom, var(--cornsilk), var(--beige));
+  background: linear-gradient(to bottom, var(--cream), #f7efd8);
   font-family: "Poppins", sans-serif;
   display: flex;
   flex-direction: column;
@@ -31,8 +31,8 @@
   font-family: "Black 900 Italic", serif;
   font-size: 6rem;
   margin: 0;
-  color: var(--light-bronze);
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  color: var(--olive);
+  text-shadow: 1px 1px 3px rgba(43, 33, 24, 0.2);
 }
 
 /* Tagline */
@@ -40,14 +40,14 @@
   font-size: 1.35rem;
   margin-top: 1rem;
   margin-bottom: 2.5rem;
-  color: #555;
+  color: var(--espresso);
   max-width: 600px;
   line-height: 1.5;
 }
 
 /* CTA Button */
 .cta-button {
-  background: var(--light-bronze);
+  background: var(--caramel);
   color: white;
   border: none;
   padding: 0.9rem 2.6rem;
@@ -61,7 +61,7 @@
 
 .cta-button:hover {
   transform: translateY(-3px);
-  background: #c29062;
+  background: #b4622d;
 }
 
 .cta-button:active {

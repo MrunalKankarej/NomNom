@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
+import "./SwipeScreen.css";
 
-// Example food lists by mood (edit whenever you want)
+// Example food lists by mood
 const FOOD_BY_MOOD = {
   lazy: [
     { id: "burger", name: "Burger 🍔" },
@@ -44,31 +45,20 @@ const FOOD_BY_MOOD = {
 export default function SwipeScreen({ mood, roomCode, userId, onFinish, onBack }) {
   const cardRef = useRef(null);
 
-  // pick the list based on mood
-  const foods = useMemo(() => {
-    return FOOD_BY_MOOD[mood] || [];
-  }, [mood]);
-
+  const foods = useMemo(() => FOOD_BY_MOOD[mood] || [], [mood]);
   const [index, setIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const current = foods[index];
 
   function goNext() {
-    // reset card position for next item
     gsap.set(cardRef.current, { x: 0, rotation: 0, opacity: 1 });
-
-    if (index + 1 >= foods.length) {
-      onFinish(); // end -> results
-      return;
-    }
-    setIndex((prev) => prev + 1);
+    if (index + 1 >= foods.length) return onFinish();
+    setIndex(prev => prev + 1);
   }
 
   function animateSwipe(direction) {
-    if (!current) return;
-    if (isAnimating) return; // prevents double-click spam
-
+    if (!current || isAnimating) return;
     setIsAnimating(true);
 
     const x = direction === "right" ? 500 : -500;
@@ -82,80 +72,40 @@ export default function SwipeScreen({ mood, roomCode, userId, onFinish, onBack }
       ease: "power2.out",
       onComplete: () => {
         setIsAnimating(false);
-
-        // later you can call backend vote here using roomCode/userId/current.id
-        // for now we just move forward
         goNext();
       },
     });
   }
 
-  function handleLike() {
-    animateSwipe("right");
-  }
-
-  function handlePass() {
-    animateSwipe("left");
-  }
-
-  if (!current) {
-    return (
-      <div style={{ textAlign: "center", marginTop: 80 }}>
-        <h2>Swipe your food</h2>
-        <p>No foods for this mood yet.</p>
-        <button onClick={onBack}>Back</button>
-      </div>
-    );
-  }
-
   return (
-    <div style={{ textAlign: "center", marginTop: 60 }}>
-      <h1 style={{ fontSize: 48, marginBottom: 10 }}>Swipe your food</h1>
-      <p style={{ fontSize: 22, marginTop: 0 }}>
+    <div className="swipe-screen">
+      <h1 className="swipe-title">Swipe your food</h1>
+      <p className="swipe-subtitle">
         Mood: <strong>{mood}</strong>
       </p>
 
-      {/* THE CARD THAT SWIPES */}
-      <div
-        ref={cardRef}
-        style={{
-          maxWidth: 720,
-          margin: "60px auto 40px",
-          padding: "70px 40px",
-          borderRadius: 30,
-          background: "white",
-          border: "1px solid #e9e9e9",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.08)",
-          fontSize: 54,
-          fontWeight: 700,
-        }}
-      >
-        {current.name}
-      </div>
+      {current && (
+        <div ref={cardRef} className="swipe-card">
+          {current.name}
+        </div>
+      )}
 
-      <div style={{ display: "flex", justifyContent: "center", gap: 18 }}>
-        <button
-          onClick={handlePass}
-          disabled={isAnimating}
-          style={{ padding: "14px 30px", fontSize: 18, cursor: "pointer" }}
-        >
+      <div className="swipe-actions">
+        <button className="btn-pass" onClick={() => animateSwipe("left")} disabled={isAnimating}>
           ❌ Pass
         </button>
-
-        <button
-          onClick={handleLike}
-          disabled={isAnimating}
-          style={{ padding: "14px 30px", fontSize: 18, cursor: "pointer" }}
-        >
+        <button className="btn-like" onClick={() => animateSwipe("right")} disabled={isAnimating}>
           ❤️ Like
         </button>
       </div>
 
-      <div style={{ marginTop: 28 }}>
-        <button onClick={onBack} style={{ marginRight: 12 }}>
-          Back
+      <div className="swipe-footer">
+        <button className="btn-back" onClick={onBack}>
+          ← Back
         </button>
-        <button onClick={onFinish}>Finish Early</button>
+        <button className="btn-finish" onClick={onFinish}>
+          Finish Early
+        </button>
       </div>
     </div>
   );
