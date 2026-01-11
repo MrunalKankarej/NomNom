@@ -3,8 +3,9 @@
 import { useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { api } from "../api";
+import "./SwipeScreen.css";
 
-// Example food lists by mood (edit whenever you want)
+// Example food lists by mood
 const FOOD_BY_MOOD = {
   lazy: [
     { id: "burger", name: "Burger 🍔" },
@@ -44,13 +45,16 @@ const FOOD_BY_MOOD = {
   ],
 };
 
-export default function SwipeScreen({ mood, roomCode, userId, onFinish, onBack }) {
+export default function SwipeScreen({
+  mood,
+  roomCode,
+  userId,
+  onFinish,
+  onBack,
+}) {
   const cardRef = useRef(null);
 
-  // pick the list based on mood
-  const foods = useMemo(() => {
-    return FOOD_BY_MOOD[mood] || [];
-  }, [mood]);
+  const foods = useMemo(() => FOOD_BY_MOOD[mood] || [], [mood]);
 
   const [index, setIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -59,13 +63,12 @@ export default function SwipeScreen({ mood, roomCode, userId, onFinish, onBack }
   const current = foods[index];
 
   function goNext() {
-    // reset card position for next item
     if (cardRef.current) {
       gsap.set(cardRef.current, { x: 0, rotation: 0, opacity: 1 });
     }
 
     if (index + 1 >= foods.length) {
-      onFinish(); // end -> results
+      onFinish();
       return;
     }
     setIndex((prev) => prev + 1);
@@ -86,15 +89,13 @@ export default function SwipeScreen({ mood, roomCode, userId, onFinish, onBack }
         }),
       });
       setErrorMsg("");
-    } catch (e) {
-      console.error(e);
+    } catch {
       setErrorMsg("Vote failed. Check backend connection.");
     }
   }
 
   function animateSwipe(direction) {
-    if (!current) return;
-    if (isAnimating) return; // prevents double-click spam
+    if (!current || isAnimating) return;
 
     setIsAnimating(true);
 
@@ -109,89 +110,58 @@ export default function SwipeScreen({ mood, roomCode, userId, onFinish, onBack }
       ease: "power2.out",
       onComplete: async () => {
         setIsAnimating(false);
-
-        // record vote in backend, then move forward
         await sendVote(direction);
         goNext();
       },
     });
   }
 
-  function handleLike() {
-    animateSwipe("right");
-  }
-
-  function handlePass() {
-    animateSwipe("left");
-  }
-
   if (!current) {
     return (
-      <div style={{ textAlign: "center", marginTop: 80 }}>
-        <h2>Swipe your food</h2>
-        <p>No foods for this mood yet.</p>
+      <div className="swipe-container">
+        <h2 className="swipe-title">Swipe your food</h2>
+        <p className="swipe-subtitle">No foods for this mood yet.</p>
         <button onClick={onBack}>Back</button>
       </div>
     );
   }
 
   return (
-    <div style={{ textAlign: "center", marginTop: 60 }}>
-      <h1 style={{ fontSize: 48, marginBottom: 10 }}>Swipe your food</h1>
-      <p style={{ fontSize: 22, marginTop: 0 }}>
+    <div className="swipe-container">
+      <h1 className="swipe-title">Swipe your food</h1>
+      <p className="swipe-subtitle">
         Mood: <strong>{mood}</strong>
       </p>
-
-      <p style={{ fontSize: 14, color: "#666", marginTop: 0 }}>
+      <p className="swipe-room">
         Room: <strong>{roomCode}</strong>
       </p>
 
-      {errorMsg && (
-        <div style={{ margin: "10px auto", maxWidth: 600, color: "crimson" }}>
-          {errorMsg}
-        </div>
-      )}
+      {errorMsg && <div className="swipe-error">{errorMsg}</div>}
 
-      {/* THE CARD THAT SWIPES */}
-      <div
-        ref={cardRef}
-        style={{
-          maxWidth: 720,
-          margin: "60px auto 40px",
-          padding: "70px 40px",
-          borderRadius: 30,
-          background: "white",
-          border: "1px solid #e9e9e9",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.08)",
-          fontSize: 54,
-          fontWeight: 700,
-        }}
-      >
+      <div ref={cardRef} className="swipe-card">
         {current.name}
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center", gap: 18 }}>
+      <div className="swipe-buttons">
         <button
-          onClick={handlePass}
+          className="btn-pass"
+          onClick={() => animateSwipe("left")}
           disabled={isAnimating}
-          style={{ padding: "14px 30px", fontSize: 18, cursor: "pointer" }}
         >
           ❌ Pass
         </button>
 
         <button
-          onClick={handleLike}
+          className="btn-like"
+          onClick={() => animateSwipe("right")}
           disabled={isAnimating}
-          style={{ padding: "14px 30px", fontSize: 18, cursor: "pointer" }}
         >
           ❤️ Like
         </button>
       </div>
 
-      <div style={{ marginTop: 28 }}>
-        <button onClick={onBack} style={{ marginRight: 12 }}>
-          Back
-        </button>
+      <div className="swipe-footer">
+        <button onClick={onBack}>Back</button>
         <button onClick={onFinish}>Finish Early</button>
       </div>
     </div>

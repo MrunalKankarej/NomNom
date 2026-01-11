@@ -6,25 +6,30 @@
   --espresso: #2b2118;
 }
 
-.swipe-screen {
+.swipe-container {
   text-align: center;
-  background: linear-gradient(to bottom, var(--cream), #f7efd8);
+  margin-top: 60px;
   min-height: 100vh;
-  padding: 60px 20px;
+  background: linear-gradient(to bottom, var(--cream), #f7efd8);
   font-family: "Poppins", sans-serif;
+  padding: 40px 20px;
 }
 
 .swipe-title {
   font-size: 48px;
   margin-bottom: 10px;
   color: var(--olive);
-  text-shadow: 1px 1px 3px rgba(43, 33, 24, 0.2);
 }
 
 .swipe-subtitle {
   font-size: 22px;
   color: var(--espresso);
-  margin-top: 0;
+  margin: 0;
+}
+
+.swipe-room {
+  font-size: 14px;
+  color: #666;
 }
 
 .swipe-card {
@@ -33,38 +38,43 @@
   padding: 70px 40px;
   border-radius: 30px;
   background: var(--cream);
-  border: 1px solid var(--sage);
+  border: 1px solid #e9e9e9;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
   font-size: 54px;
   font-weight: 700;
   color: var(--olive);
 }
 
-.swipe-actions {
+.swipe-error {
+  margin: 10px auto;
+  max-width: 600px;
+  color: crimson;
+}
+
+.swipe-buttons {
   display: flex;
   justify-content: center;
   gap: 18px;
-  margin-bottom: 28px;
+  margin-top: 20px;
 }
 
-.swipe-actions button {
+.swipe-buttons button {
   padding: 14px 30px;
   font-size: 18px;
-  font-weight: 600;
-  border-radius: 12px;
   cursor: pointer;
   border: none;
-  transition: transform 0.2s ease, background 0.2s ease;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.swipe-buttons button:hover:not(:disabled) {
+  transform: translateY(-2px);
 }
 
 .btn-pass {
-  background: #f4d1a1;
-  color: var(--espresso);
-}
-
-.btn-pass:hover {
-  transform: translateY(-2px);
-  background: #e4b670;
+  background: #f2dede;
+  color: #a94442;
 }
 
 .btn-like {
@@ -72,28 +82,14 @@
   color: white;
 }
 
-.btn-like:hover {
-  transform: translateY(-2px);
-  background: #b4622d;
-}
-
 .swipe-footer {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
+  margin-top: 28px;
 }
 
-.btn-back, .btn-finish {
-  background: var(--sage);
-  color: var(--olive);
+.swipe-footer button {
   padding: 10px 14px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-}
-
-.btn-back:hover, .btn-finish:hover {
-  background: var(--olive);
-  color: var(--cream);
+  margin-right: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  cursor: pointer;
 }
