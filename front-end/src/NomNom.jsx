@@ -1,3 +1,5 @@
+// NomNom.jsx
+
 import { useEffect, useState } from "react";
 import { api } from "./api";
 
@@ -26,75 +28,71 @@ export default function NomNom() {
 
   function handleSelectMood(selectedMood) {
     setMood(selectedMood);
-  
-    // resets old room info when switching moods
+
+    // reset any old room info when switching moods
     setRoomCode("");
-  
+    setUserId("");
+
     setScreen("room");
   }
-  
 
-  function handleCreateRoom() {
-    //  ONLY uppercase letters (NO numbers)
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let code = "";
-  
-    for (let i = 0; i < 4; i++) {
-      code += chars[Math.floor(Math.random() * chars.length)];
-    }
-  
-    setRoomCode(code);
-  
-    // Save mood for this code
-    const raw = localStorage.getItem("nomnom_roomMoodMap");
-    const map = raw ? JSON.parse(raw) : {};
-    map[code] = mood;
-    localStorage.setItem("nomnom_roomMoodMap", JSON.stringify(map));
+  async function handleCreateRoom() {
+  console.log("Create Room clicked. Mood:", mood);
+
+  try {
+    const created = await api("/api/rooms", {
+      method: "POST",
+      body: JSON.stringify({ mood }),
+    });
+
+    setRoomCode(created.roomCode);
+
+    const joined = await api(`/api/rooms/${created.roomCode}/join`, {
+      method: "POST",
+    });
+
+    setUserId(joined.userId);
+  } catch (e) {
+    console.error(e);
+    alert("Could not create room. Make sure the backend is running.");
   }
-  
-  
-  function handleJoinRoom(code) {
-    const rawInput = (code || "").trim();
-  
-    //  Reject lowercase
-    if (rawInput !== rawInput.toUpperCase()) {
-      alert("Invalid code. Use ALL CAPS letters only.");
-      return;
-    }
-  
-    //  Reject anything that is NOT exactly 4 letters A–Z
+}
+
+
+  async function handleJoinRoom(code) {
+    const rawInput = (code || "").trim().toUpperCase();
+
+    // Reject anything not exactly 4 letters A–Z
     const valid = /^[A-Z]{4}$/.test(rawInput);
     if (!valid) {
-      alert("Invalid code. Room codes must be EXACTLY 4 uppercase letters (A–Z). No numbers.");
+      alert("Invalid code. Room codes must be EXACTLY 4 uppercase letters (A–Z).");
       return;
     }
-  
-    //  Check if this code exists
-    const raw = localStorage.getItem("nomnom_roomMoodMap");
-    const map = raw ? JSON.parse(raw) : {};
-    const codeMood = map[rawInput];
-  
-    if (!codeMood) {
-      alert("Code not found. Ask the host to share the correct code.");
-      return;
-    }
-  
-    //  Reject if wrong mood
-    if (codeMood !== mood) {
-      alert(`Wrong mood 😭 This code belongs to "${codeMood}", not "${mood}".`);
-      return;
-    }
-  
-    //  Valid join
-    setRoomCode(rawInput);
-    setScreen("swipe");
-  }
-  
-  
-  
 
+    try {
+      const joined = await api(`/api/rooms/${rawInput}/join`, { method: "POST" });
+
+      // Optional mood check based on backend mood
+      if (joined.mood && mood && joined.mood !== mood) {
+        alert(`Wrong mood 😭 This room is "${joined.mood}", not "${mood}".`);
+        return;
+      }
+
+      setRoomCode(rawInput);
+      setUserId(joined.userId);
+      setScreen("swipe");
+    } catch (e) {
+      console.error(e);
+      alert("Room not found or backend not reachable.");
+    }
+  }
 
   function handleStartSwiping() {
+    // If someone created the room, they already have roomCode and userId
+    if (!roomCode || !userId) {
+      alert("Please create or join a room first.");
+      return;
+    }
     setScreen("swipe");
   }
 
@@ -105,7 +103,9 @@ export default function NomNom() {
   function handleRestart() {
     setMood(null);
     setRoomCode("");
-    localStorage.removeItem("nomnom_roomMoodMap");
+    setUserId("");
+    localStorage.removeItem("roomCode");
+    localStorage.removeItem("userId");
     setScreen("welcome");
   }
 
